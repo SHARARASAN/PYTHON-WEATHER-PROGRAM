@@ -1,0 +1,38 @@
+import http.client
+import json
+
+def get_weather(city, api_key):
+    conn = http.client.HTTPConnection("api.openweathermap.org")
+    url = f"/data/2.5/weather?q={city}&appid={api_key}&units=metric"
+    new_func(conn, url)
+    res = conn.getresponse()
+    data = res.read().decode('utf-8')
+    
+    if res.status == 200:
+        weather_data = json.loads(data)
+        main = weather_data['main']
+        weather = weather_data['weather'][0]
+        
+        temperature = main['temp']
+        pressure = main['pressure']
+        humidity = main['humidity']
+        weather_description = weather['description']
+        
+        print(f"\nWeather in {city.capitalize()}:")
+        print(f"Temperature: {temperature}°C")
+        print(f"Pressure: {pressure} hPa")
+        print(f"Humidity: {humidity}%")
+        print(f"Description: {weather_description.capitalize()}\n")
+    else:
+        print(f"Error: {res.status} - Unable to fetch weather data")
+
+def new_func(conn, url):
+    conn.request("GET", url)
+
+if __name__ == "__main__":
+    api_key = "2f08bae31a098a6825a7afce594e2f39"  # Replace with your OpenWeatherMap API key
+    city = input("Enter city name: ").strip()
+    if city:
+        get_weather(city, api_key)
+    else:
+        print("Please enter a valid city name.")
